@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simsimi Api</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+</head>
+<body>
+<style>
+*{
+    margin: 0;
+    font-family: 'Raleway', sans-serif;
+
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+  }
+
+html, body {
+    height:100%;
+}
+
+.container{
+    width: 100%;
+    padding: 10px;
+    height: 100%;
+    box-sizing: border-box;
+    background-color: #ecf0f1;
+}
+
+
+.boxSend{
+    position: fixed;
+    display: flex;
+    bottom: 0;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 30px;
+    padding-left: 0;
+    padding-right: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.inputSend{
+    padding: 15px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0px 6px 38px -19px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 6px 38px -19px rgba(0,0,0,0.75);
+    box-shadow: 0px 6px 38px -19px rgba(0,0,0,0.75);
+    width: 60%;
+    border: none;
+    outline: 0;
+}
+
+.btnSend{
+    padding: 15px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    display: flex;
+    margin-left: 1vw;
+    color: #27ae60;
+    cursor: pointer;
+    background-color: #fff;
+    border-radius: 50%;
+    -webkit-box-shadow: 0px 6px 38px -19px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 6px 38px -19px rgba(0,0,0,0.75);
+    box-shadow: 0px 6px 38px -19px rgba(0,0,0,0.75);
+    border: none;
+    outline: 0;
+}
+
+.btnSend:hover{
+    color: #2ecc71;
+}
+
+
+.box{
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+#chat{
+    height: 85%;
+    box-sizing: border-box;
+    overflow: hidden;
+    overflow-y: scroll;
+}
+
+
+.sendMsg{
+    background-color: #27ae60;
+    color: #fff;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-right: 3vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-radius: 20px;
+    border-bottom-right-radius: 0px;
+    word-wrap: break-word;
+}
+
+
+.recivedMsg{
+    background-color: #bdc3c7;
+    color: #fff;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-left: 3vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-radius: 20px;
+    border-bottom-left-radius: 0px;
+    word-wrap: break-word;
+}
+
+
+
+.right{
+    justify-content: flex-end;
+    box-sizing: border-box;
+}
+
+
+.left{
+    justify-content: flex-start;
+    box-sizing: border-box;
+}
+.hide{
+    display: none;
+    visibility: hidden;
+}
+
+
+</style>
+    <div class="container">
+        <div id="chat">
+              
+        </div>
+        <div class="boxSend">
+        <input id="msg" class="inputSend" type="text" placeholder="Insira algo aqui..."/>
+        <a id="btnSend" class="btnSend"><i id="send-btn" class="material-icons">send</i></a>
+        </div>
+    </div>
+</body>
+<script>
+
+
+var podeEnviar = true;
+var nivel = 0.2;
+
+function send(){
+  if($('#msg').val().toLowerCase() && $('#msg').val().toLowerCase().indexOf("!") != 0){
+    $.get('localhost/simsimi/' +  encodeURIComponent($('#msg').val()) + '/' + nivel, 
+  function (data, textStatus, jqXHR) { 
+      if(data.body.statusMessage == 'Ok'){         
+        $('#chat').append('<div class="box left"><span class="recivedMsg">' + data.body.atext + '</span></div>')
+        $('#send-btn').html('send')
+        $('#chat').animate({scrollTop:10000000},'50');
+        podeEnviar = true;
+        
+      }else{
+        $('#chat').append('<div class="box left"><span class="recivedMsg">Não entendi, digite novamente.</span></div>')
+        $('.material-icons').html('send')
+        $('#chat').animate({scrollTop:10000000},'50');
+        podeEnviar = true;
+      }
+});
+    podeEnviar = false;
+    $('#send-btn').html('sync')
+    $('#chat').append('<div class="box right"><span class="sendMsg">' + $('#msg').val() + '</span></div>')
+    $('#msg').val('')
+    $('#chat').animate({scrollTop:10000000},'50');
+}else{
+
+  if($('#msg').val().toLowerCase() == '!clear' || $('#msg').val().toLowerCase() == '!cls'){
+    $('#chat').html(' ')
+    $('#msg').val('')
+  }else if($('#msg').val().toLowerCase().indexOf("!userforge") == 0){
+    let r = String($('#msg').val())
+    let r1 = r.split(" ")
+    let text = ''
+    r1.forEach((item,index) => {
+      if(index > 0){
+        text += item + ' '
+      }
+    })
+
+    $('#chat').append('<div class="box right"><span class="sendMsg">' + text + '</span></div>')
+    $('#chat').animate({scrollTop:10000000},'50');
+    $('#msg').val('')
+  }else if($('#msg').val().toLowerCase().indexOf("!botforge") == 0){
+
+    let r = String($('#msg').val())
+    let r1 = r.split(" ")
+    let text = ''
+    r1.forEach((item,index) => {
+      if(index > 0){
+        text += item + ' '
+      }
+    })
+
+    $('#chat').append('<div class="box left"><span class="recivedMsg">' + text + '</span></div>')
+    $('#chat').animate({scrollTop:10000000},'50');
+    $('#msg').val('')
+
+  }else if($('#msg').val().toLowerCase() == '!comandos' || $('#msg').val().toLowerCase() == '!commands'){
+    $('#chat').append('<div class="box left"><span class="recivedMsg">!clear<br>!userforge<br>!botforge</span></div>')
+    $('#chat').animate({scrollTop:10000000},'50');
+    $('#msg').val('')
+  }else if($('#msg').val().toLowerCase() == '!protect'){
+    $('#chat').append('<div class="box right"><span class="sendMsg">!protect</span></div>')
+    if(nivel == 0.2){
+      nivel = 1.0
+      $('#chat').append('<div class="box left"><span class="recivedMsg">Proteção desativada!</span></div>')
+    }else{
+      nivel = 0.2
+      $('#chat').append('<div class="box left"><span class="recivedMsg">Proteção ativada!</span></div>')
+    }
+    $('#chat').animate({scrollTop:10000000},'50');
+    $('#msg').val('')
+
+  }
+
+
+}
+
+}
+
+
+$('#btnSend').on('click', () => {
+  send()
+})
+
+$('#msg').keypress(function (e) {
+  if (e.which == 13 && podeEnviar == true) {
+    send()
+    return false; 
+  }
+});
+</script>
+</html>
